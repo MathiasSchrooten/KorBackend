@@ -29,6 +29,9 @@ const dialogflow = require('dialogflow');
 const sessionClientKor = new dialogflow.SessionsClient({ keyFilename: "kor/imc-axsbio-1b701901777b.json"});
 const contextClientKor = new dialogflow.ContextsClient({ keyFilename: "kor/imc-axsbio-1b701901777b.json"});
 
+app.get('/test', function(req, res) {
+   res.send("Test received");
+});
 
 app.post('/kor/getBotResponse', async function(req, res) {
     console.log("getBotResponse ACTIVATED...");
