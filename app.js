@@ -235,5 +235,9 @@ app.post('/kor/getBotResponse', async function(req, res) {
     }
 });
 
-let port = process.env.PORT || 5000;
+app.get('/healthcheck', (req, res) => {
+    res.sendStatus(200);
+});
+
+let port = process.env.PORT || 5001;
 app.listen(port, () => console.log(`App running on port ${port}`));
