@@ -50,10 +50,12 @@ app.post('/kor/getBotResponse', async function(req, res) {
         }
     };
 
+    console.log("detecting Intent now...");
     try {
         sessionClientKor.detectIntent(request)
             .then(async responses => {
                 let response = "";
+                let responsesArray = [10];
                 let result = responses[0];
                 let mp3url = "";
                 let imageUrl = "";
@@ -80,6 +82,7 @@ app.post('/kor/getBotResponse', async function(req, res) {
                         }
                     }
                 }
+                console.log("through 1st loop");
 
                 if (responses[0].queryResult.fulfillmentMessages.length === 1) {
                     console.log("ffMessages length == 1");
@@ -196,21 +199,37 @@ app.post('/kor/getBotResponse', async function(req, res) {
                                             };
                                             pdfUrl = "";
                                         } else {
-                                            response = {
-                                                name: 'DEFAULT',
-                                                content: result.queryResult.fulfillmentMessages[0].text.text[0]
-                                            };
-
+                                            if (result.queryResult.fulfillmentMessages[0].text) {
+                                                response = {
+                                                    name: 'DEFAULT',
+                                                    content: result.queryResult.fulfillmentMessages[0].text.text[0]
+                                                };
+                                            } else {
+                                                if (result.queryResult.fulfillmentMessages[0].simpleResponses) {
+                                                    if (result.queryResult.fulfillmentMessages[0].simpleResponses.simpleResponses) {
+                                                        console.log(result.queryResult.fulfillmentMessages[0].simpleResponses);
+                                                        response = {
+                                                            name: 'DEFAULT',
+                                                            content: result.queryResult.fulfillmentMessages[0].simpleResponses.simpleResponses[0].textToSpeech
+                                                        }
+                                                    }
+                                                }
+                                                // console.log(">>>>>>> result.queryResult.fulfillmentMessages[0].text.text[0] IS EMPTY OR DOES NOT EXIST >>>>>>>>");
+                                                // console.log(result.queryResult.fulfillmentMessages[0].simpleResponses.simpleResponses);
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                        console.log("returning response = " + i.toString());
-                        console.log(response);
+
                         if (i > 0) {
-                            if (result.queryResult.fulfillmentMessages[i] !== result.queryResult.fulfillmentMessages[i-1]) {
+                            if (result.queryResult.fulfillmentMessages[i] !== result.queryResult.fulfillmentMessages[i-1] && mp3url === "") {
                                 result.queryResult.fulfillmentMessages[i] = response;
+                                console.log("mp3url = " + mp3url);
+                                console.log("returning response = " + i.toString());
+                                console.log(response.name);
+                                console.log(response.content);
                                 response = "";
                             }
                         } else {
