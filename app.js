@@ -160,7 +160,15 @@ app.post('/kor/getBotResponse', async function(req, res) {
 
                                 } else {
                                     if (result.queryResult.fulfillmentMessages[i].text !== "") {
+                                        console.log("IDFKCKDKKFJD");
+                                        console.log(botText);
 
+                                        //console.log(result.queryResult.fulfillmentMessages[i].text.text);
+                                        response = {
+                                            name: 'DEFAULT',
+                                            content: botText
+                                        };
+                                        //responses[0].queryResult.fulfillmentMessages[i] = response;
                                         // if (mp3url !== "") {
                                         //     response = {
                                         //         name: 'MP3',
@@ -205,6 +213,7 @@ app.post('/kor/getBotResponse', async function(req, res) {
                                                     name: 'DEFAULT',
                                                     content: result.queryResult.fulfillmentMessages[0].text.text[0]
                                                 };
+                                                //responses[0].queryResult.fulfillmentMessages[i] = response;
                                             } else {
                                                 if (result.queryResult.fulfillmentMessages[0].simpleResponses) {
                                                     if (result.queryResult.fulfillmentMessages[0].simpleResponses.simpleResponses) {
@@ -212,7 +221,8 @@ app.post('/kor/getBotResponse', async function(req, res) {
                                                         response = {
                                                             name: 'DEFAULT',
                                                             content: result.queryResult.fulfillmentMessages[0].simpleResponses.simpleResponses[0].textToSpeech
-                                                        }
+                                                        };
+                                                        //responses[0].queryResult.fulfillmentMessages[i] = response;
                                                     }
                                                 }
                                             }
@@ -224,7 +234,15 @@ app.post('/kor/getBotResponse', async function(req, res) {
                         }
 
 
+                    } else {
+                    if (result.queryResult.fulfillmentMessages[0].text) {
+                        response = {
+                            name: 'DEFAULT',
+                            content: result.queryResult.fulfillmentMessages[0].text.text[0]
+                        };
+                        responses[0].queryResult.fulfillmentMessages[0] = response;
                     }
+                }
                     console.log("LENGTH BEFORE LOOP = " + result.queryResult.fulfillmentMessages.length);
 
                     let counter = [];
@@ -232,14 +250,12 @@ app.post('/kor/getBotResponse', async function(req, res) {
                     for (let x = 0; x < result.queryResult.fulfillmentMessages.length; x++) {
                         console.log(result.queryResult.fulfillmentMessages[x].name);
                         if (result.queryResult.fulfillmentMessages[x].name === 'multi') {
-                        } else {
-
-                            if (result.queryResult.fulfillmentMessages[x].name === undefined && !result.queryResult.fulfillmentMessages[x].suggestions ) {
+                            console.log(result.queryResult.fulfillmentMessages[x].name );
+                            if (result.queryResult.fulfillmentMessages[x].name === undefined || typeof result.queryResult.fulfillmentMessages[x].name === 'undefined'  ) {
 
                                 console.log("256 deleted " + x + " from array to return");
                                 console.log(result.queryResult.fulfillmentMessages[x]);
                                 counter.unshift(x);
-                                //result.queryResult.fulfillmentMessages.splice(x, 1);
                                 continue;
                             }
 
@@ -260,6 +276,15 @@ app.post('/kor/getBotResponse', async function(req, res) {
                                     continue;
                                 }
                             }
+                        } else {
+                            console.log("in else of ===undefined && !.suggestions");
+                            if (result.queryResult.fulfillmentMessages[x].name === undefined || typeof result.queryResult.fulfillmentMessages[x].name === 'undefined'  ) {
+
+                                console.log("256 deleted " + x + " from array to return");
+                                console.log(result.queryResult.fulfillmentMessages[x]);
+                                counter.unshift(x);
+                                continue;
+                            }
 
                             //
                             // if (result.queryResult.fulfillmentMessages[x].platform === 'ACTIONS_ON_GOOGLE') {
@@ -270,7 +295,8 @@ app.post('/kor/getBotResponse', async function(req, res) {
 
 
                     }
-
+                    console.log("counter.length = " + counter.length);
+                    console.log(counter);
                     for (let y = 0; y < counter.length; y++) {
                         result.queryResult.fulfillmentMessages.splice(counter[y], 1);
                         console.log("deleted " + y);
