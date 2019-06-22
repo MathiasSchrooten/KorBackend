@@ -64,6 +64,7 @@ app.post('/kor/getBotResponse', async function(req, res) {
                 let isMulti = false;
                 let userText = "";
                 let botText = "";
+                let botReplyInMulti = false;
 
                 console.log("length of fulfillmentMessages = " + responses[0].queryResult.fulfillmentMessages.length);
 
@@ -111,6 +112,7 @@ app.post('/kor/getBotResponse', async function(req, res) {
 
                         if (fulfillment.platform === 'ACTIONS_ON_GOOGLE') {
                             if (isMulti) {
+                                botReplyInMulti = true;
                                 response = {
                                     name: "multi",
                                     content: botText,
@@ -158,9 +160,14 @@ app.post('/kor/getBotResponse', async function(req, res) {
                                         pdfUrl: pdfUrl,
                                         videoUrl: videoUrl
                                     };
+                                    isMulti = true;
+                                    console.log("=== RETURNING PREMATURELY!!!");
+                                    responses[0].queryResult.fulfillmentMessages[i] = response;
+                                    // res.send(responses[0].queryResult.fulfillmentMessages[i]);
+                                    // return;
 
                                 } else {
-                                    if (result.queryResult.fulfillmentMessages[i].text !== "") {
+                                    if (result.queryResult.fulfillmentMessages[i].text) {
                                         console.log("IDFKCKDKKFJD");
                                         console.log(botText);
 
@@ -169,8 +176,9 @@ app.post('/kor/getBotResponse', async function(req, res) {
                                             name: 'DEFAULT',
                                             content: botText
                                         };
+                                        responses[0].queryResult.fulfillmentMessages[i] = response;
 
-                                        } else {
+                                    } else {
                                             if (result.queryResult.fulfillmentMessages[0].text) {
                                                 response = {
                                                     name: 'DEFAULT',
@@ -210,9 +218,11 @@ app.post('/kor/getBotResponse', async function(req, res) {
 
                     let counter = [];
 
+
                     for (let x = 0; x < result.queryResult.fulfillmentMessages.length; x++) {
                         console.log(result.queryResult.fulfillmentMessages[x].name);
                         if (result.queryResult.fulfillmentMessages[x].name === 'multi') {
+                            botReplyInMulti = true;
                             console.log(result.queryResult.fulfillmentMessages[x].name );
                             if (result.queryResult.fulfillmentMessages[x].name === undefined || typeof result.queryResult.fulfillmentMessages[x].name === 'undefined'  ) {
 
@@ -232,6 +242,11 @@ app.post('/kor/getBotResponse', async function(req, res) {
                                 }
                             }
 
+                            if (result.queryResult.fulfillmentMessages[x].name === 'DEFAULT' && botReplyInMulti ) {
+                                console.log("name === default && botReplyInMulti = true");
+                                counter.unshift(x);
+                            }
+
                             if (result.queryResult.fulfillmentMessages[x].text) {
                                 if (result.queryResult.fulfillmentMessages[x].text.text[0] === botText) {
                                     counter.unshift(x);
@@ -248,12 +263,13 @@ app.post('/kor/getBotResponse', async function(req, res) {
                                 counter.unshift(x);
                                 continue;
                             }
-
-                            //
-                            // if (result.queryResult.fulfillmentMessages[x].platform === 'ACTIONS_ON_GOOGLE') {
-                            //     console.log("ACTIONS_ON_GOOGLE INCOMING");
-                            //     console.log(result.queryResult.fulfillmentMessages[x].payload.fields);
-                            // }
+                            if (botReplyInMulti) {
+                                if (result.queryResult.fulfillmentMessages[x].name === 'DEFAULT') {
+                                    console.log("256 deleted " + x + " from array to return");
+                                    console.log(result.queryResult.fulfillmentMessages[x]);
+                                    counter.unshift(x);
+                                }
+                            }
                         }
 
 
@@ -265,9 +281,9 @@ app.post('/kor/getBotResponse', async function(req, res) {
                         console.log("deleted " + y);
                     }
                     console.log("LENGTH AFTER LOOP = " + result.queryResult.fulfillmentMessages.length);
+                    console.log(result.queryResult.fulfillmentMessages[0]);
                     console.log(result.queryResult.fulfillmentMessages[1]);
                     console.log(result.queryResult.fulfillmentMessages[2]);
-                    console.log(result.queryResult.fulfillmentMessages[3]);
                     res.send(result);
             });
     } catch (e) {
