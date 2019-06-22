@@ -34,7 +34,6 @@ app.get('/test', function(req, res) {
 });
 
 app.post('/kor/getBotResponse', async function(req, res) {
-    console.log("getBotResponse ACTIVATED...");
 
     let text = req.body.text;
     let projectId = 'imc-axsbio';
@@ -50,154 +49,156 @@ app.post('/kor/getBotResponse', async function(req, res) {
         }
     };
 
-    console.log("detecting Intent now...");
     try {
         sessionClientKor.detectIntent(request)
             .then(async responses => {
                 let response = "";
                 let responsesArray = [10];
                 let result = responses[0];
-                let mp3url = "";
-                let imageUrl = "";
-                let pdfUrl = "";
-                let videoUrl = "";
+                let mp3url = false;
+                let imageUrl = false;
+                let pdfUrl = false;
+                let videoUrl = false;
+                let isAttachment = false;
+                let isMulti = false;
                 let userText = "";
+                let botText = "";
 
-                for (let i = 0; i < responses[0].queryResult.fulfillmentMessages.length; i++) {
-                    let fulfillment = responses[0].queryResult.fulfillmentMessages[i];
-                    if (fulfillment.payload) {
-                        if (fulfillment.payload.fields) {
-                            if (fulfillment.payload.fields.mp3url) {
-                                mp3url = fulfillment.payload.fields.mp3url.stringValue;
-                            }
-                            if (fulfillment.payload.fields.imageUrl) {
-                                imageUrl = fulfillment.payload.fields.imageUrl.stringValue;
-                            }
-                            if (fulfillment.payload.fields.pdfUrl) {
-                                pdfUrl = fulfillment.payload.fields.pdfUrl.stringValue;
-                            }
-                            if (fulfillment.payload.fields.videoUrl) {
-                                videoUrl = fulfillment.payload.fields.videoUrl.stringValue;
+                console.log("length of fulfillmentMessages = " + responses[0].queryResult.fulfillmentMessages.length);
+
+                if (responses[0].queryResult.fulfillmentMessages.length > 1) {
+                    console.log("more than 1 fulfillmentMessage!");
+                    for (let i = 0; i < responses[0].queryResult.fulfillmentMessages.length; i++) {
+                        let fulfillment = responses[0].queryResult.fulfillmentMessages[i];
+                        console.log("fulfillmentMessage #" + i);
+                        console.log(responses[0].queryResult.fulfillmentMessages[i]);
+                        if (fulfillment.payload) {
+                            if (fulfillment.payload.fields) {
+                                if (fulfillment.payload.fields.mp3url) {
+                                    mp3url = fulfillment.payload.fields.mp3url.stringValue;
+                                    isMulti = true;
+                                }
+                                if (fulfillment.payload.fields.imageUrl) {
+                                    imageUrl = fulfillment.payload.fields.imageUrl.stringValue;
+                                    isMulti = true;
+                                }
+                                if (fulfillment.payload.fields.pdfUrl) {
+                                    pdfUrl = fulfillment.payload.fields.pdfUrl.stringValue;
+                                    isMulti = true;
+
+                                }
+                                if (fulfillment.payload.fields.videoUrl) {
+                                    videoUrl = fulfillment.payload.fields.videoUrl.stringValue;
+                                    isMulti = true;
+
+                                }
                             }
                         }
+                        if (fulfillment.simpleResponses) {
+                            botText = fulfillment.simpleResponses.simpleResponses[0].textToSpeech;
+                        } else if (fulfillment.text) {
+                            botText = fulfillment.text.text[0]
+                        }
+                        console.log(">>>>>>>>>>>>>>>>>>>>>>>>> botText =");
+                        console.log(botText);
                     }
-                }
-                console.log("through 1st loop");
 
-                if (responses[0].queryResult.fulfillmentMessages.length === 1) {
-                    console.log("ffMessages length == 1");
-                    if (mp3url !== "") {
-                        response = {
-                            name: 'DEFAULT',
-                            content: result.queryResult.fulfillmentMessages[0].text.text[0],
-                            mp3url: mp3url
-                        };
-                    } else if (imageUrl !== "") {
-                        response = {
-                            name: 'image',
-                            content: result.queryResult.fulfillmentMessages[i].text.text[0],
-                            imageUrl: imageUrl
-                        };
 
-                    } else if (pdfUrl !== "") {
-                        response = {
-                            name: 'pdf',
-                            content: result.queryResult.fulfillmentMessages[i].text.text[0],
-                            pdfUrl: pdfUrl
-                        };
-                    } else if (videoUrl !== "") {
-                        response = {
-                            name: 'video',
-                            content: result.queryResult.fulfillmentMessages[i].text.text[0],
-                            pdfUrl: videoUrl
-                        };
-                    } else {
-                        console.log("no media present");
-                        response = {
-                            name: 'DEFAULT',
-                            content: result.queryResult.fulfillmentMessages[0].text.text[0]
-                        };
-                    }
-                    result.queryResult.fulfillmentMessages[0] = response;
-                } else {
-                    console.log("array > 1");
                     for (let i = 0; i < responses[0].queryResult.fulfillmentMessages.length; i++) {
                         let fulfillment = responses[0].queryResult.fulfillmentMessages[i];
 
 
                         if (fulfillment.platform === 'ACTIONS_ON_GOOGLE') {
-                            if (fulfillment.simpleResponses) {
-                                if (mp3url !== "") {
-                                    response = {
-                                        name: 'SIMPLE_RESPONSE',
-                                        content: {
-                                            textToSpeech: fulfillment.simpleResponses.simpleResponses[0].textToSpeech
-                                        },
-                                        mp3url: mp3url
-                                    };
-                                } else {
-                                    response = {
-                                        name: 'SIMPLE_RESPONSE',
-                                        content: {
-                                            textToSpeech: fulfillment.simpleResponses.simpleResponses[0].textToSpeech
-                                        }
-                                    };
-                                }
+                            if (isMulti) {
+                                response = {
+                                    name: "multi",
+                                    content: botText,
+                                    mp3url: mp3url,
+                                    imageUrl: imageUrl,
+                                    pdfUrl: pdfUrl,
+                                    videoUrl: videoUrl
+                                };
+                                responses[0].queryResult.fulfillmentMessages[i] = response;
+                                console.log("===== returning multi ====== ");
+                                console.log(response);
 
                             } else {
+                                //TODO: this else may be a problem with suggestions...
                                 if (fulfillment.suggestions) {
-                                    let numberOfButtons = fulfillment.suggestions.suggestions.length;
-                                    let buttons = [];
+                                    if (fulfillment.suggestions) {
+                                        console.log("SUGGESTIONS FOUND!!!!!");
+                                        let numberOfButtons = fulfillment.suggestions.suggestions.length;
+                                        let buttons = [];
 
-                                    for (let j = 0; j < numberOfButtons; j++) {
-                                        let b = fulfillment.suggestions.suggestions[j].title;
-                                        buttons.push(b);
+                                        for (let j = 0; j < numberOfButtons; j++) {
+                                            let b = fulfillment.suggestions.suggestions[j].title;
+                                            buttons.push(b);
+                                        }
+                                        response = {
+                                            name: 'SUGGESTIONS',
+                                            content: buttons
+                                        };
+                                        responses[0].queryResult.fulfillmentMessages[i] = response;
                                     }
-                                    response = {
-                                        name: 'SUGGESTIONS',
-                                        content: buttons
-                                    };
+
                                 }
                             }
+
+
                         } else {
                             if (fulfillment.platform === 'PLATFORM_UNSPECIFIED') {
-                                if (fulfillment.payload) {
+
+                                if (isMulti) {
+                                    response = {
+                                        name: "multi",
+                                        content: botText,
+                                        mp3url: mp3url,
+                                        imageUrl: imageUrl,
+                                        pdfUrl: pdfUrl,
+                                        videoUrl: videoUrl
+                                    };
 
                                 } else {
-                                    console.log("fulfillment.platform === UNSPECIFIED check data below");
-                                    console.log(result.queryResult.fulfillmentMessages[i]);
-                                    if (result.queryResult.fulfillmentMessages[i].text.text !== "") {
-                                        console.log("mp3url filledIn = " + mp3url);
-                                        console.log("imageurl filledIn = " + imageUrl);
+                                    if (result.queryResult.fulfillmentMessages[i].text !== "") {
 
-                                        if (mp3url !== "") {
-                                            response = {
-                                                name: 'MP3',
-                                                content: result.queryResult.fulfillmentMessages[i].text.text[0],
-                                                mp3url: mp3url
-                                            };
-                                            mp3url = "";
-                                        } else if (imageUrl !== "") {
-                                            response = {
-                                                name: 'image',
-                                                content: result.queryResult.fulfillmentMessages[i].text.text[0],
-                                                imageUrl: imageUrl
-                                            };
-                                            imageUrl = "";
-                                        } else if (videoUrl !== "") {
-                                            response = {
-                                                name: 'video',
-                                                content: result.queryResult.fulfillmentMessages[i].text.text[0],
-                                                videoUrl: videoUrl
-                                            };
-                                            imageUrl = "";
-                                        } else if (pdfUrl !== "") {
-                                            response = {
-                                                name: 'pdf',
-                                                content: result.queryResult.fulfillmentMessages[i].text.text[0],
-                                                pdfUrl: pdfUrl
-                                            };
-                                            pdfUrl = "";
+                                        // if (mp3url !== "") {
+                                        //     response = {
+                                        //         name: 'MP3',
+                                        //         content: result.queryResult.fulfillmentMessages[i].text.text[0],
+                                        //         mp3url: mp3url
+                                        //     };
+                                        //     mp3url = "";
+                                        // } else if (imageUrl !== "") {
+                                        //     response = {
+                                        //         name: 'image',
+                                        //         content: result.queryResult.fulfillmentMessages[i].text.text[0],
+                                        //         imageUrl: imageUrl
+                                        //     };
+                                        //     imageUrl = "";
+                                        // } else if (videoUrl !== "") {
+                                        //     response = {
+                                        //         name: 'video',
+                                        //         content: result.queryResult.fulfillmentMessages[i].text.text[0],
+                                        //         videoUrl: videoUrl
+                                        //     };
+                                        //     imageUrl = "";
+                                        // } else if (pdfUrl !== "") {
+                                        //     response = {
+                                        //         name: 'pdf',
+                                        //         content: result.queryResult.fulfillmentMessages[i].text.text[0],
+                                        //         pdfUrl: pdfUrl
+                                        //     };
+                                        //     pdfUrl = "";
+                                        // } else if (isMulti) {
+                                        //     response = {
+                                        //         name: "multi",
+                                        //         content: fulfillment.simpleResponses.simpleResponses[0].textToSpeech,
+                                        //         mp3url: mp3url,
+                                        //         imageUrl: imageUrl,
+                                        //         pdfUrl: pdfUrl,
+                                        //         videoUrl: videoUrl
+                                        //     };
+                                        //     console.log("is multi");
                                         } else {
                                             if (result.queryResult.fulfillmentMessages[0].text) {
                                                 response = {
@@ -214,38 +215,71 @@ app.post('/kor/getBotResponse', async function(req, res) {
                                                         }
                                                     }
                                                 }
-                                                // console.log(">>>>>>> result.queryResult.fulfillmentMessages[0].text.text[0] IS EMPTY OR DOES NOT EXIST >>>>>>>>");
-                                                // console.log(result.queryResult.fulfillmentMessages[0].simpleResponses.simpleResponses);
                                             }
                                         }
                                     }
                                 }
                             }
+                            isMulti = false;
                         }
 
-                        if (i > 0) {
-                            if (result.queryResult.fulfillmentMessages[i] !== result.queryResult.fulfillmentMessages[i-1] && mp3url === "") {
-                                result.queryResult.fulfillmentMessages[i] = response;
-                                console.log("mp3url = " + mp3url);
-                                console.log("returning response = " + i.toString());
-                                console.log(response.name);
-                                console.log(response.content);
-                                response = "";
-                            }
-                        } else {
-                            //response = "";
-                            console.log("i !> 0");
-                        }
 
                     }
-                }
-                //result.queryResult.fulfillmentMessages[0] = response;
-                //console.log("sending back this shit: ");
-                //console.log(result);
-                // for (let x = 0; x < result.queryResult.fulfillmentMessages; x++) {
-                //     console.log(result.queryResult.fulfillmentMessages[x]);
-                // }
-                res.send(result);
+                    console.log("LENGTH BEFORE LOOP = " + result.queryResult.fulfillmentMessages.length);
+
+                    let counter = [];
+
+                    for (let x = 0; x < result.queryResult.fulfillmentMessages.length; x++) {
+                        console.log(result.queryResult.fulfillmentMessages[x].name);
+                        if (result.queryResult.fulfillmentMessages[x].name === 'multi') {
+                        } else {
+
+                            if (result.queryResult.fulfillmentMessages[x].name === undefined && !result.queryResult.fulfillmentMessages[x].suggestions ) {
+
+                                console.log("256 deleted " + x + " from array to return");
+                                console.log(result.queryResult.fulfillmentMessages[x]);
+                                counter.unshift(x);
+                                //result.queryResult.fulfillmentMessages.splice(x, 1);
+                                continue;
+                            }
+
+                            if (result.queryResult.fulfillmentMessages[x].message === "payload") {
+                                console.log(result.queryResult.fulfillmentMessages[x]);
+                                console.log("MESSAGES[X].MESSAGE =  " + result.queryResult.fulfillmentMessages[x].message);
+                                if (result.queryResult.fulfillmentMessages[x].message === "payload") {
+                                    counter.unshift(x);
+                                    //result.queryResult.fulfillmentMessages.splice(x, 1);
+                                    continue;
+                                }
+                            }
+
+                            if (result.queryResult.fulfillmentMessages[x].text) {
+                                if (result.queryResult.fulfillmentMessages[x].text.text[0] === botText) {
+                                    counter.unshift(x);
+                                    //result.queryResult.fulfillmentMessages.splice(x, 1);
+                                    continue;
+                                }
+                            }
+
+                            //
+                            // if (result.queryResult.fulfillmentMessages[x].platform === 'ACTIONS_ON_GOOGLE') {
+                            //     console.log("ACTIONS_ON_GOOGLE INCOMING");
+                            //     console.log(result.queryResult.fulfillmentMessages[x].payload.fields);
+                            // }
+                        }
+
+
+                    }
+
+                    for (let y = 0; y < counter.length; y++) {
+                        result.queryResult.fulfillmentMessages.splice(counter[y], 1);
+                        console.log("deleted " + y);
+                    }
+                    console.log("LENGTH AFTER LOOP = " + result.queryResult.fulfillmentMessages.length);
+                    console.log(result.queryResult.fulfillmentMessages[1]);
+                    console.log(result.queryResult.fulfillmentMessages[2]);
+                    console.log(result.queryResult.fulfillmentMessages[3]);
+                    res.send(result);
             });
     } catch (e) {
         console.log("error =>");
