@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ce7200c5-31ac-47db-9008-1c7ce366b35e" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/app.js" afterDir="false" />
-    </list>
+    <list default="true" id="ce7200c5-31ac-47db-9008-1c7ce366b35e" name="Default" comment="" />
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
     <ignored path="$PROJECT_DIR$/tmp/" />
@@ -28,8 +26,8 @@
       <file leaf-file-name="app.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="478">
-              <caret line="279" column="84" lean-forward="true" selection-start-line="279" selection-start-column="84" selection-end-line="279" selection-end-column="84" />
+            <state relative-caret-position="373">
+              <caret line="272" column="105" lean-forward="true" selection-start-line="272" selection-start-column="105" selection-end-line="272" selection-end-column="105" />
               <folding>
                 <element signature="e#7728#7751#0" />
               </folding>
@@ -190,12 +188,12 @@
       <workItem from="1561016959543" duration="128000" />
       <workItem from="1561054463652" duration="6922000" />
       <workItem from="1561103293240" duration="5000" />
-      <workItem from="1561191516353" duration="21157000" />
+      <workItem from="1561191516353" duration="21797000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="47702000" />
+    <option name="totallyTimeSpent" value="48342000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-589" y="-1310" width="1559" height="1259" extended-state="0" />
@@ -205,11 +203,11 @@
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.35714287" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.35714287" />
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info id="npm" order="2" side_tool="true" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Terminal" order="7" weight="0.24268502" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="7" visible="true" weight="0.24268502" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -557,8 +555,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="478">
-          <caret line="279" column="84" lean-forward="true" selection-start-line="279" selection-start-column="84" selection-end-line="279" selection-end-column="84" />
+        <state relative-caret-position="373">
+          <caret line="272" column="105" lean-forward="true" selection-start-line="272" selection-start-column="105" selection-end-line="272" selection-end-column="105" />
           <folding>
             <element signature="e#7728#7751#0" />
           </folding>

@@ -168,45 +168,7 @@ app.post('/kor/getBotResponse', async function(req, res) {
                                             name: 'DEFAULT',
                                             content: botText
                                         };
-                                        //responses[0].queryResult.fulfillmentMessages[i] = response;
-                                        // if (mp3url !== "") {
-                                        //     response = {
-                                        //         name: 'MP3',
-                                        //         content: result.queryResult.fulfillmentMessages[i].text.text[0],
-                                        //         mp3url: mp3url
-                                        //     };
-                                        //     mp3url = "";
-                                        // } else if (imageUrl !== "") {
-                                        //     response = {
-                                        //         name: 'image',
-                                        //         content: result.queryResult.fulfillmentMessages[i].text.text[0],
-                                        //         imageUrl: imageUrl
-                                        //     };
-                                        //     imageUrl = "";
-                                        // } else if (videoUrl !== "") {
-                                        //     response = {
-                                        //         name: 'video',
-                                        //         content: result.queryResult.fulfillmentMessages[i].text.text[0],
-                                        //         videoUrl: videoUrl
-                                        //     };
-                                        //     imageUrl = "";
-                                        // } else if (pdfUrl !== "") {
-                                        //     response = {
-                                        //         name: 'pdf',
-                                        //         content: result.queryResult.fulfillmentMessages[i].text.text[0],
-                                        //         pdfUrl: pdfUrl
-                                        //     };
-                                        //     pdfUrl = "";
-                                        // } else if (isMulti) {
-                                        //     response = {
-                                        //         name: "multi",
-                                        //         content: fulfillment.simpleResponses.simpleResponses[0].textToSpeech,
-                                        //         mp3url: mp3url,
-                                        //         imageUrl: imageUrl,
-                                        //         pdfUrl: pdfUrl,
-                                        //         videoUrl: videoUrl
-                                        //     };
-                                        //     console.log("is multi");
+
                                         } else {
                                             if (result.queryResult.fulfillmentMessages[0].text) {
                                                 response = {
