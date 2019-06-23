@@ -10,7 +10,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const corsOpts = {
-    origin: 'https://mathiasschrooten.github.io/dialogflow-web-v2',
+    origin: '*',
 
     methods: [
         'GET',
